@@ -1,0 +1,48 @@
+{
+   "checksum": "e33e83b988c2a1267e2575d48d0e0008",
+   "roots": {
+      "bookmark_bar": {
+         "children": [  ],
+         "date_added": "13371240384308215",
+         "date_last_used": "0",
+         "date_modified": "0",
+         "guid": "0bc5d13f-2cba-5d74-951f-3f233fe6c908",
+         "id": "1",
+         "name": "Bookmarks bar",
+         "type": "folder"
+      },
+      "other": {
+         "children": [ {
+            "date_added": "13403023308711188",
+            "date_last_used": "13415709159417195",
+            "guid": "400c609d-b937-404f-92b6-b2358d1ae152",
+            "id": "3",
+            "meta_info": {
+               "power_bookmark_meta": ""
+            },
+            "name": "MoE, National Institute Ranking Framework (NIRF)",
+            "type": "url",
+            "url": "https://www.nirfindia.org/Rankings/2023/OverallRanking.html"
+         } ],
+         "date_added": "13371240384308227",
+         "date_last_used": "0",
+         "date_modified": "13403023308711188",
+         "guid": "82b081ec-3dd3-529c-8475-ab6c344590dd",
+         "id": "2",
+         "name": "Other bookmarks",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [  ],
+         "date_added": "13371240384308230",
+         "date_last_used": "0",
+         "date_modified": "0",
+         "guid": "4cf2e351-0e85-532b-bb37-df045d8f8d0f",
+         "id": "4",
+         "name": "Mobile bookmarks",
+         "type": "folder"
+      }
+   },
+   "sync_metadata": "CnAKUAiIgQISSiAAkgE2CjQKDmNocm9tZV9zeW5jX2JtEgU1MSFibRoSCfetlOLtSgYAEfetlOLtSgYAKQQTl+LtSgYA6gEMCOXQy8wGEMCw7KABEgAqGHRtWGorVzBNWDFVTS9mV3RpWThtQWc9PUgDEsMBCAISvgEKHFljU1RvbnZFU1B3cUNzNEwyY3JWaHY2OEw5OD0SZlo6QURxdEFaek5qQ1dSTGtaelJ3Mnlnd1hkZGVNMCtadUsvYjVBNlVCMi9kbnBZZ0lUVUJTSEtNWWc5dm95UGUvU0QvNFhPUzBoUGQ4RkJKcDV6Zjg5bzM3S0EzRExTM2xkTmc9PRgAIAAoADDj2M7xw8+IAzgAQABKHG9QVmtod0JSYlY2NUtDV1IyK0lPTkhXb091OD1aAGUAAAAAEusBCAMS5gEKHFdwbUJNdi9LUEFOOUJudXVKcFF0bll2a0RCVT0SZlo6QURxdEFadzBRZ1BuaWJkS0tXd25mZ1ZLeWhveUdkL2hPZmpTajRDMFErY3EwZDlNL3VWc3FkMjgvSU5TNkVCRjNrYklSOEQ4SHI3Y3ljMHBicG8vRk4zMkd6RVRCZy9JOGc9PRgAIAAoADDU6KOWxOyPAzinn+yNlzNAp5/sjZczShxRdjg2UWYyajNwSmw1VHpUT0NUY2h0Yzd4UU09Wh4iHDNZMm8vdDN6TUVXWThwRFR0OGovNWVlaTdaRT1ltT46VxKrAQgBEqYBChx5eEovNmZ2a2VjcjdrcDVFUXpCNHRXTHBkYkU9Ek5aOkFEcXRBWnlPM2pNUk1WSTJUVG52TFVOdGs0VTFvNTBPUkR5azhsSU5zV01sWGQ2ODhRQk0xU0tzdFJCQU9nS3pIN0JwY0F1NEp5VVcYACAAKAAw49jO8cPPiAM4AEAAShxhUkNXTGdoRjliNUlucUtJRHZ1Si9qdlFrRmM9WgBlAAAAABLDAQgEEr4BChxuamdEdTg4ZUNydlhwODZwRDdmSEdjcUZwODg9EmZaOkFEcXRBWnloUXNzVlpDN3IyYXhnNVVwZVNtVlZVS3FhUmRVckpEQUxzT1hiRCt3R1VBckUvWWpKemdma0VkS1dpNm9OY0xpdk85RC9pdndDZFdkR1NJazRXMnczRGd0dUJRPT0YACAAKAAw49jO8cPPiAM4AEAAShx5ek5CMDFjbjU0QTdjUlUwdVQrL1BnbVR0VW89WgBlAAAAADABOAA=",
+   "version": 1
+}

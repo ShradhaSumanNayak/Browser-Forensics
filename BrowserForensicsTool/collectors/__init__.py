@@ -1,0 +1,1 @@
+# Initialize the collectors package

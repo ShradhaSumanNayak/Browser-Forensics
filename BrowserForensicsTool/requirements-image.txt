@@ -1,0 +1,2 @@
+pytsk3>=20231007
+# Install pyewf separately on platforms where E01 support is required.

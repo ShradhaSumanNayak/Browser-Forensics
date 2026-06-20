@@ -1,0 +1,2 @@
+{"timestamp": "2026-03-14T17:09:47.249808+00:00", "client_ip": "127.0.0.1", "path": "/trigger", "method": "POST", "status": 202, "message": "trigger_accepted", "payload_keys": ["case_id", "do_chrome"]}
+{"timestamp": "2026-03-14T17:09:47.256362+00:00", "client_ip": "127.0.0.1", "path": "/trigger", "method": "POST", "status": 429, "message": "An extraction is already in progress. Please wait.", "payload_keys": []}
