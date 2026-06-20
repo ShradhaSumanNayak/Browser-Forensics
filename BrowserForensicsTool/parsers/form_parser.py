@@ -2,37 +2,28 @@ import sqlite3
 import datetime
 from pathlib import Path
 
+from parsers.browser_detection import browser_label, detect_browser, is_chromium, is_firefox_family
+
+
 class FormParser:
     """
     Parses Autofill data, form history, and search engine keywords across Chromium and Firefox.
     """
+
     def __init__(self, db_path):
         self.db_path = Path(db_path)
+        self.browser = detect_browser(self.db_path.name)
         self.browser_type = self._detect_browser_type()
 
     def _detect_browser_type(self):
-        name = self.db_path.name.lower()
-        if "chrome" in name or "edge" in name or "brave" in name or "opera" in name:
+        if is_chromium(self.browser):
             return "chrome_edge"
-        elif "firefox" in name or "tor" in name:
+        if is_firefox_family(self.browser):
             return "firefox"
         return "unknown"
 
     def _browser_label(self):
-        name = self.db_path.name.lower()
-        if "chrome" in name:
-            return "Chrome"
-        if "edge" in name:
-            return "Edge"
-        if "brave" in name:
-            return "Brave"
-        if "opera" in name:
-            return "Opera"
-        if "tor" in name:
-            return "Tor"
-        if "firefox" in name:
-            return "Firefox"
-        return "Unknown"
+        return browser_label(browser=self.browser)
 
     def _chrome_time(self, timestamp):
         if not timestamp:
@@ -76,14 +67,13 @@ class FormParser:
                             "Usage Count": count
                         })
                 except sqlite3.Error:
-                    pass # Table might not exist in old versions
+                    pass
 
                 # 2. Search Keywords (Address Bar Searches)
                 try:
-                    # In Web Data, there is often a keyword_search_terms table
                     query = """
-                    SELECT term, last_visit_time 
-                    FROM keyword_search_terms 
+                    SELECT term, last_visit_time
+                    FROM keyword_search_terms
                     ORDER BY last_visit_time DESC
                     """
                     cursor.execute(query)
@@ -101,7 +91,6 @@ class FormParser:
                     pass
 
             elif self.browser_type == "firefox":
-                # Firefox formhistory.sqlite
                 try:
                     query = "SELECT fieldname, value, firstUsed, lastUsed, timesUsed FROM moz_formhistory"
                     cursor.execute(query)

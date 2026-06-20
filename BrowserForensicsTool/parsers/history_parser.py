@@ -2,39 +2,26 @@ import sqlite3
 import datetime
 from pathlib import Path
 
+from parsers.browser_detection import browser_label, detect_browser, is_chromium, is_firefox_family
+
+
 class HistoryParser:
     def __init__(self, db_path):
         self.db_path = Path(db_path)
+        self.browser = detect_browser(self.db_path.name)
         self.browser_type = self._detect_browser_type()
 
     def _detect_browser_type(self):
-        name = self.db_path.name.lower()
-        # All of these share the standard Chromium History schema
-        if any(x in name for x in ["chrome", "edge", "brave", "opera"]):
+        if is_chromium(self.browser):
             return "chrome_edge"
-        elif "firefox" in name or "tor" in name:
+        if is_firefox_family(self.browser):
             return "firefox"
-        elif "safari" in name:
+        if self.browser == "safari":
             return "safari"
         return "unknown"
 
     def _browser_label(self):
-        name = self.db_path.name.lower()
-        if "chrome" in name:
-            return "Chrome"
-        if "edge" in name:
-            return "Edge"
-        if "brave" in name:
-            return "Brave"
-        if "opera" in name:
-            return "Opera"
-        if "tor" in name:
-            return "Tor"
-        if "firefox" in name:
-            return "Firefox"
-        if "safari" in name:
-            return "Safari"
-        return "Unknown"
+        return browser_label(browser=self.browser)
 
     def _chrome_time(self, timestamp):
         # WebKit epoch (microseconds since Jan 1, 1601)
@@ -53,7 +40,7 @@ class HistoryParser:
             return datetime.datetime(1970, 1, 1) + datetime.timedelta(microseconds=timestamp)
         except Exception:
             return ""
-        
+
     def _safari_time(self, timestamp):
         # CoreData epoch (seconds since Jan 1, 2001)
         if not timestamp:
@@ -83,7 +70,7 @@ class HistoryParser:
             if self.browser_type == "chrome_edge":
                 # Advanced Chrome/Edge join across urls and visits
                 query = """
-                SELECT u.id, u.url, u.title, u.visit_count, u.hidden, 
+                SELECT u.id, u.url, u.title, u.visit_count, u.hidden,
                        v.visit_time, v.visit_duration, v.transition
                 FROM urls u
                 JOIN visits v ON u.id = v.url
@@ -106,7 +93,7 @@ class HistoryParser:
 
             elif self.browser_type == "firefox":
                 query = """
-                SELECT p.id, p.url, p.title, p.visit_count, p.hidden, 
+                SELECT p.id, p.url, p.title, p.visit_count, p.hidden,
                        v.visit_date, v.visit_type
                 FROM moz_places p
                 JOIN moz_historyvisits v ON p.id = v.place_id
@@ -123,10 +110,10 @@ class HistoryParser:
                         "Visit Count": count,
                         "Hidden": "Yes" if hidden else "No",
                         "Last Visit Time": self._firefox_time(v_time),
-                        "Visit Duration (secs)": "", # Firefox doesn't easily store duration here
+                        "Visit Duration (secs)": "",
                         "Transition Type": f"Type_{v_type}"
                     })
-                    
+
             elif self.browser_type == "safari":
                 query = """
                 SELECT i.id, i.url, v.title, v.visit_time
@@ -142,7 +129,7 @@ class HistoryParser:
                         "Record ID": i_id,
                         "URL": url,
                         "Title": title,
-                        "Visit Count": "", 
+                        "Visit Count": "",
                         "Hidden": "",
                         "Last Visit Time": self._safari_time(v_time),
                         "Visit Duration (secs)": "",
@@ -151,6 +138,6 @@ class HistoryParser:
             conn.close()
         except sqlite3.Error as e:
             print(f"[-] SQLite Error reading history {self.db_path}: {e}")
-            
+
         print(f"[+] Parsed {len(results)} extended history records from {self.db_path.name}.")
         return results

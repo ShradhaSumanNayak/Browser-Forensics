@@ -3,6 +3,8 @@ import re
 import sqlite3
 from pathlib import Path
 
+from parsers.browser_detection import browser_label
+
 
 class BrowserStorageParser:
     def __init__(self, artifact_path, max_records=500):
@@ -13,22 +15,7 @@ class BrowserStorageParser:
         self._seen = set()
 
     def _browser_label(self):
-        name = self.artifact_path.name.lower()
-        if "chrome" in name:
-            return "Chrome"
-        if "edge" in name:
-            return "Edge"
-        if "brave" in name:
-            return "Brave"
-        if "opera" in name:
-            return "Opera"
-        if "tor" in name:
-            return "Tor"
-        if "firefox" in name:
-            return "Firefox"
-        if "safari" in name:
-            return "Safari"
-        return "Unknown"
+        return browser_label(self.artifact_path.name)
 
     def _storage_category(self):
         name = self.artifact_path.name.lower()
@@ -224,3 +211,6 @@ class BrowserStorageParser:
                 break
             results.extend(self._parse_file(file_path))
         return results
+
+
+

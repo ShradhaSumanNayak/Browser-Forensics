@@ -10,7 +10,7 @@ def test_normalize_seconds_epoch():
     sec = 1609459200  # 2021-01-01 00:00:00 UTC
     ts = g._normalize_time(sec)
     assert isinstance(ts, pd.Timestamp)
-    assert ts == pd.Timestamp(datetime.datetime.utcfromtimestamp(sec))
+    assert ts == pd.Timestamp(datetime.datetime.fromtimestamp(sec, datetime.UTC)).tz_localize(None)
 
 
 def test_normalize_milliseconds_epoch():
@@ -18,17 +18,15 @@ def test_normalize_milliseconds_epoch():
     ms = 1609459200000  # 2021-01-01 00:00:00 UTC in ms
     ts = g._normalize_time(ms)
     assert isinstance(ts, pd.Timestamp)
-    assert ts == pd.Timestamp(datetime.datetime.utcfromtimestamp(ms / 1000.0))
+    assert ts == pd.Timestamp(datetime.datetime.fromtimestamp(ms / 1000.0, datetime.UTC)).tz_localize(None)
 
 
 def test_normalize_webkit_microseconds():
     g = TimelineGenerator(".")
-    # choose a known datetime and compute WebKit-style microseconds since 1601-01-01
     dt = datetime.datetime(2022, 1, 2, 3, 4, 5)
     webkit_us = int((dt - datetime.datetime(1601, 1, 1)).total_seconds() * 1_000_000)
     ts = g._normalize_time(webkit_us)
     assert isinstance(ts, pd.Timestamp)
-    # compare core components to avoid timezone issues
     t_dt = ts.to_pydatetime()
     assert (t_dt.year, t_dt.month, t_dt.day, t_dt.hour, t_dt.minute, t_dt.second) == (
         dt.year,

@@ -49,6 +49,7 @@ from utils.cms_exporter import CMSExporter
 from utils.llm_analyzer import LLMIntentAnalyzer
 from utils.session_hijacker import SessionHijackerTheForge
 from parsers.permissions_parser import PermissionsParser
+from parsers.browser_detection import detect_browser, is_chromium, is_firefox_family
 
 
 def _build_image_artifact_prefix(browser_key, profile_path):
@@ -96,11 +97,21 @@ def execute_extraction(output=None, do_chrome=False, do_firefox=False, do_edge=F
     if output is None:
         output_dir = Path(os.path.join(get_desktop_path(), "forensics_output"))
     else:
-        output_dir = Path(sanitize_path(output))
+        sanitized_output = sanitize_path(output)
+        if not sanitized_output:
+            log("[-] Error: Invalid or unsafe output directory specified.")
+            return False
+        output_dir = Path(sanitized_output)
+
+    sanitized_image_path = sanitize_path(image_path)
+    if image_path and not sanitized_image_path:
+        log("[-] Error: Invalid or unsafe image path specified.")
+        return False
+    image_path = sanitized_image_path
+
     if not str(output_dir):
         log("[-] Error: Invalid or unsafe output directory specified.")
         return False
-    image_path = sanitize_path(image_path)
     output_dir.mkdir(parents=True, exist_ok=True)
     evidence_dir = output_dir / "extracted_databases"
     evidence_dir.mkdir(parents=True, exist_ok=True)
@@ -270,13 +281,19 @@ def execute_extraction(output=None, do_chrome=False, do_firefox=False, do_edge=F
     for db_file in collected_files:
         if db_file.exists():
             name = db_file.name.lower()
+            browser_key = detect_browser(db_file.name)
 
             # Skip WAL and SHM files during primary parsing (they are for recovery)
             if name.endswith("-wal") or name.endswith("-shm"):
                 continue
 
             # History
-            if ("history" in name or "places" in name) and fetch_history:
+            should_parse_history = (
+                (is_chromium(browser_key) and "history" in name)
+                or (is_firefox_family(browser_key) and "places" in name)
+                or (browser_key == "safari" and name.endswith("history.db"))
+            )
+            if should_parse_history and fetch_history:
                 log(f"    -> Parsing History from {name}...")
                 hp = HistoryParser(db_file)
                 all_history.extend(hp.parse())
@@ -288,7 +305,11 @@ def execute_extraction(output=None, do_chrome=False, do_firefox=False, do_edge=F
                 all_cookies.extend(cp.parse())
 
             # Bookmarks
-            if ("bookmark" in name or "places" in name) and fetch_bookmarks:
+            should_parse_bookmarks = (
+                ("bookmark" in name and browser_key in {"chrome", "edge", "brave", "opera", "safari"})
+                or (is_firefox_family(browser_key) and "places" in name)
+            )
+            if should_parse_bookmarks and fetch_bookmarks:
                 log(f"    -> Parsing Bookmarks from {name}...")
                 bp = BookmarksParser(db_file)
                 all_bookmarks.extend(bp.parse())
@@ -344,7 +365,12 @@ def execute_extraction(output=None, do_chrome=False, do_firefox=False, do_edge=F
                 all_cloud_sync.extend(csp.parse())
 
             # Downloads (Chromium/Firefox/Safari)
-            if ("history" in name or "places" in name or name.endswith("downloads.plist")):
+            should_parse_downloads = (
+                (is_chromium(browser_key) and "history" in name)
+                or (is_firefox_family(browser_key) and "places" in name)
+                or name.endswith("downloads.plist")
+            )
+            if should_parse_downloads:
                 log(f"    -> Parsing Downloads from {name}...")
                 dp = DownloadsParser(db_file)
                 all_downloads.extend(dp.parse())
@@ -746,3 +772,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -36,12 +36,12 @@ class TimelineGenerator:
                     return pd.Timestamp(datetime.datetime(1601, 1, 1) + datetime.timedelta(microseconds=int(v)))
                 # Milliseconds since Unix epoch
                 if v > 1e12:
-                    return pd.Timestamp(datetime.datetime.utcfromtimestamp(v / 1000.0))
+                    return pd.Timestamp(datetime.datetime.fromtimestamp(v / 1000.0, datetime.UTC)).tz_localize(None)
                 # Seconds since Unix epoch
                 if v > 1e9:
-                    return pd.Timestamp(datetime.datetime.utcfromtimestamp(v))
+                    return pd.Timestamp(datetime.datetime.fromtimestamp(v, datetime.UTC)).tz_localize(None)
                 # Fallback: treat as seconds
-                return pd.Timestamp(datetime.datetime.utcfromtimestamp(v))
+                return pd.Timestamp(datetime.datetime.fromtimestamp(v, datetime.UTC)).tz_localize(None)
             except Exception:
                 return None
         try:

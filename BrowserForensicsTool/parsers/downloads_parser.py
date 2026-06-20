@@ -3,39 +3,26 @@ import plistlib
 import sqlite3
 from pathlib import Path
 
+from parsers.browser_detection import browser_label, detect_browser, is_chromium, is_firefox_family
+
 
 class DownloadsParser:
     def __init__(self, db_path):
         self.db_path = Path(db_path)
+        self.browser = detect_browser(self.db_path.name)
         self.browser_type = self._detect_browser_type()
 
     def _detect_browser_type(self):
-        name = self.db_path.name.lower()
-        if any(token in name for token in ["chrome", "edge", "brave", "opera"]):
+        if is_chromium(self.browser):
             return "chromium"
-        if "firefox" in name or "tor" in name:
+        if is_firefox_family(self.browser):
             return "firefox"
-        if "safari" in name and name.endswith(".plist"):
+        if self.browser == "safari" and self.db_path.name.lower().endswith(".plist"):
             return "safari"
         return "unknown"
 
     def _browser_label(self):
-        name = self.db_path.name.lower()
-        if "chrome" in name:
-            return "Chrome"
-        if "edge" in name:
-            return "Edge"
-        if "brave" in name:
-            return "Brave"
-        if "opera" in name:
-            return "Opera"
-        if "tor" in name:
-            return "Tor"
-        if "firefox" in name:
-            return "Firefox"
-        if "safari" in name:
-            return "Safari"
-        return "Unknown"
+        return browser_label(browser=self.browser)
 
     def _chrome_time(self, timestamp):
         if not timestamp:
